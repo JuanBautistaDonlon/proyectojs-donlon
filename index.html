@@ -1,11 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Calculadora Interactiva</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        input,
+        button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .result,
+        .history {
+            margin-top: 20px;
+        }
+    </style>
 </head>
-<body>
-    <script src="./scripts/main.js"></script>
+
+<h1>Calculadora</h1>
+
+<div>
+    <input type="number" id="num1" placeholder="Ingresa el primer número" />
+    <input type="number" id="num2" placeholder="Ingresa el segundo número" />
+</div>
+
+<div>
+    <button id="sumarBtn">Sumar</button>
+    <button id="restarBtn">Restar</button>
+    <button id="multiplicarBtn">Multiplicar</button>
+    <button id="dividirBtn">Dividir</button>
+</div>
+
+<div>
+    <button id="mostrarHistorialBtn">Mostrar Historial</button>
+    <button id="filtrarHistorialBtn">Filtrar por operación</button>
+</div>
+
+<div class="result">
+    <h2>Resultado:</h2>
+    <p id="resultado"></p>
+</div>
+
+<div class="history">
+    <h2>Historial:</h2>
+    <ul id="historial"></ul>
+</div>
+
+<div>
+    <input type="text" id="filtroOperacion" placeholder="Ingresa la operación para filtrar (Suma, Resta, etc.)" />
+</div>
+
+<script src="./scripts/main.js"></script>
 </body>
+
 </html>

@@ -1,7 +1,8 @@
 class Calculadora {
     constructor() {
-        this.historial = [];
+        this.historial = this.cargarHistorial();
     }
+
     sumar(num1, num2) {
         let resultado = num1 + num2;
         this.agregarHistorial(num1, num2, 'Suma', resultado);
@@ -31,17 +32,46 @@ class Calculadora {
 
     agregarHistorial(num1, num2, operacion, resultado) {
         this.historial.push({ num1, num2, operacion, resultado });
+        this.guardarHistorial();
+    }
+
+    guardarHistorial() {
+        localStorage.setItem('historial', JSON.stringify(this.historial));
+    }
+
+    cargarHistorial() {
+        const historialGuardado = localStorage.getItem('historial');
+        return historialGuardado ? JSON.parse(historialGuardado) : [];
     }
 
     mostrarHistorial() {
+        const historialList = document.getElementById('historial');
+        historialList.innerHTML = '';
+
         if (this.historial.length === 0) {
-            alert("No hay historial de operaciones.");
+            historialList.innerHTML = '<li>No hay historial de operaciones.</li>';
         } else {
-            let mensaje = "Historial de operaciones:\n";
             this.historial.forEach((op, index) => {
-                mensaje += `${index + 1}. ${op.num1} ${op.operacion} ${op.num2} = ${op.resultado}\n`;
+                const listItem = document.createElement('li');
+                listItem.textContent = `${op.num1} ${op.operacion} ${op.num2} = ${op.resultado}`;
+                historialList.appendChild(listItem);
             });
-            alert(mensaje);
+        }
+    }
+
+    filtrarPorOperacion(operacion) {
+        const resultadosFiltrados = this.historial.filter(op => op.operacion.toLowerCase() === operacion.toLowerCase());
+        const historialList = document.getElementById('historial');
+        historialList.innerHTML = '';
+
+        if (resultadosFiltrados.length === 0) {
+            historialList.innerHTML = `<li>No se encontraron operaciones de tipo: ${operacion}</li>`;
+        } else {
+            resultadosFiltrados.forEach((op, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${op.num1} ${op.operacion} ${op.num2} = ${op.resultado}`;
+                historialList.appendChild(listItem);
+            });
         }
     }
 
@@ -50,59 +80,71 @@ class Calculadora {
     }
 }
 
-function iniciarCalculadora() {
-    let calculadora = new Calculadora();
-    let continuar = true;
+const calculadora = new Calculadora();
 
-    while (continuar) {
-        let opcion = prompt("Selecciona una opción:\n1. Sumar\n2. Restar\n3. Multiplicar\n4. Dividir\n5. Ver historial\n6. Salir");
-
-        if (opcion === '6') {
-            continuar = false;
-            alert("¡Gracias por usar la calculadora!");
-            break;
-        }
-
-        let num1 = prompt("Ingresa el primer número:");
-        let num2 = prompt("Ingresa el segundo número:");
-
-        num1 = Number(num1);
-        num2 = Number(num2);
-
-        if (!calculadora.validarNumero(num1) || !calculadora.validarNumero(num2)) {
-            alert("Por favor ingresa solo números válidos.");
-            continue;
-        }
-
-        let resultado;
-
-        switch (opcion) {
-            case '1':
-                resultado = calculadora.sumar(num1, num2);
-                alert(`El resultado de la suma es: ${resultado}`);
-                break;
-            case '2':
-                resultado = calculadora.restar(num1, num2);
-                alert(`El resultado de la resta es: ${resultado}`);
-                break;
-            case '3':
-                resultado = calculadora.multiplicar(num1, num2);
-                alert(`El resultado de la multiplicación es: ${resultado}`);
-                break;
-            case '4':
-                resultado = calculadora.dividir(num1, num2);
-                alert(`El resultado de la división es: ${resultado}`);
-                break;
-            case '5':
-                calculadora.mostrarHistorial();
-                break;
-            default:
-                alert("Opción no válida. Por favor selecciona una opción válida.");
-                break;
-        }
-
-        continuar = confirm("¿Quieres realizar otra operación?");
-    }
+function mostrarResultado(resultado) {
+    const resultadoElemento = document.getElementById('resultado');
+    resultadoElemento.textContent = `El resultado es: ${resultado}`;
 }
 
-iniciarCalculadora();
+document.getElementById('sumarBtn').addEventListener('click', () => {
+    const num1 = parseFloat(document.getElementById('num1').value);
+    const num2 = parseFloat(document.getElementById('num2').value);
+    if (!calculadora.validarNumero(num1) || !calculadora.validarNumero(num2)) {
+        alert('Por favor ingresa solo números válidos.');
+        return;
+    }
+    const resultado = calculadora.sumar(num1, num2);
+    mostrarResultado(resultado);
+});
+
+document.getElementById('restarBtn').addEventListener('click', () => {
+    const num1 = parseFloat(document.getElementById('num1').value);
+    const num2 = parseFloat(document.getElementById('num2').value);
+    if (!calculadora.validarNumero(num1) || !calculadora.validarNumero(num2)) {
+        alert('Por favor ingresa solo números válidos.');
+        return;
+    }
+    const resultado = calculadora.restar(num1, num2);
+    mostrarResultado(resultado);
+});
+
+document.getElementById('multiplicarBtn').addEventListener('click', () => {
+    const num1 = parseFloat(document.getElementById('num1').value);
+    const num2 = parseFloat(document.getElementById('num2').value);
+    if (!calculadora.validarNumero(num1) || !calculadora.validarNumero(num2)) {
+        alert('Por favor ingresa solo números válidos.');
+        return;
+    }
+    const resultado = calculadora.multiplicar(num1, num2);
+    mostrarResultado(resultado);
+});
+
+document.getElementById('dividirBtn').addEventListener('click', () => {
+    const num1 = parseFloat(document.getElementById('num1').value);
+    const num2 = parseFloat(document.getElementById('num2').value);
+    if (!calculadora.validarNumero(num1) || !calculadora.validarNumero(num2)) {
+        alert('Por favor ingresa solo números válidos.');
+        return;
+    }
+    const resultado = calculadora.dividir(num1, num2);
+    mostrarResultado(resultado);
+});
+
+document.getElementById('mostrarHistorialBtn').addEventListener('click', () => {
+    calculadora.mostrarHistorial();
+});
+
+document.getElementById('filtrarHistorialBtn').addEventListener('click', () => {
+    const operacion = document.getElementById('filtroOperacion').value;
+    if (operacion.trim() === '') {
+        alert('Por favor ingresa una operación para filtrar.');
+        return;
+    }
+    calculadora.filtrarPorOperacion(operacion);
+});
+
+window.onload = function () {
+    document.getElementById('resultado').textContent = '¡Bienvenido a la calculadora interactiva!';
+    calculadora.mostrarHistorial();
+};
