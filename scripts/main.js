@@ -31,7 +31,8 @@ class Calculadora {
     }
 
     agregarHistorial(num1, num2, operacion, resultado) {
-        this.historial.push({ num1, num2, operacion, resultado });
+        const fecha = new Date().toISOString(); // Se agrega la fecha a cada operación
+        this.historial.push({ num1, num2, operacion, resultado, fecha });
         this.guardarHistorial();
     }
 
@@ -51,9 +52,10 @@ class Calculadora {
         if (this.historial.length === 0) {
             historialList.innerHTML = '<li>No hay historial de operaciones.</li>';
         } else {
-            this.historial.forEach((op, index) => {
+            const historialOrdenado = _.orderBy(this.historial, ['fecha'], ['desc']);
+            historialOrdenado.forEach((op) => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `${op.num1} ${op.operacion} ${op.num2} = ${op.resultado}`;
+                listItem.textContent = `${op.num1} ${op.operacion} ${op.num2} = ${op.resultado} (Fecha: ${op.fecha})`;
                 historialList.appendChild(listItem);
             });
         }
@@ -67,9 +69,9 @@ class Calculadora {
         if (resultadosFiltrados.length === 0) {
             historialList.innerHTML = `<li>No se encontraron operaciones de tipo: ${operacion}</li>`;
         } else {
-            resultadosFiltrados.forEach((op, index) => {
+            resultadosFiltrados.forEach((op) => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `${op.num1} ${op.operacion} ${op.num2} = ${op.resultado}`;
+                listItem.textContent = `${op.num1} ${op.operacion} ${op.num2} = ${op.resultado} (Fecha: ${op.fecha})`;
                 historialList.appendChild(listItem);
             });
         }
@@ -77,6 +79,30 @@ class Calculadora {
 
     validarNumero(valor) {
         return !isNaN(valor) && valor !== '';
+    }
+
+    cargarHistorialDesdeJSON() {
+        fetch('historial.json')
+            .then(response => response.json())
+            .then(data => {
+                this.historial = data;
+                this.mostrarHistorial();
+            })
+            .catch(error => {
+                console.error("Error al cargar el historial desde JSON:", error);
+            });
+    }
+
+    cargarHistorialDesdeAPI() {
+        fetch('https://api.ejemplo.com/historial')
+            .then(response => response.json())
+            .then(data => {
+                this.historial = data;
+                this.mostrarHistorial();
+            })
+            .catch(error => {
+                console.error("Error al cargar el historial desde la API:", error);
+            });
     }
 }
 
@@ -142,6 +168,10 @@ document.getElementById('filtrarHistorialBtn').addEventListener('click', () => {
         return;
     }
     calculadora.filtrarPorOperacion(operacion);
+});
+
+document.getElementById('cargarHistorialBtn').addEventListener('click', () => {
+    calculadora.cargarHistorialDesdeAPI();
 });
 
 window.onload = function () {
